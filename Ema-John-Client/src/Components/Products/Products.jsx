@@ -35,7 +35,18 @@ const Products = () => {
             });
     }, []);
 
-
+    let handleClear = () => {
+        axios
+            .delete('http://localhost:5000/cartData')
+            .then((res) => {
+                console.log(res.data);
+                if (res.data.deletedCount > 0) {
+                    setCart([]);
+                    setTotalItems(0);
+                    setTotalPrice(0);
+                }
+            })
+    }
 
     return (
         <div className='w-[90%] mx-auto'>
@@ -51,13 +62,13 @@ const Products = () => {
                                         <div className='px-4 py-6 space-y-3'>
                                             <img
                                                 className='w-full h-[285px] rounded-lg'
-                                                src={product.img}
+                                                src={product?.img}
                                                 alt=""
                                             />
                                             <div className='space-y-3 flex flex-col flex-grow'>
-                                                <h2 className='text-black text-xl font-bold'>{product.name}</h2>
-                                                <h2 className='text-gray-700 text-lg font-bold'>Price: ${product.price}</h2>
-                                                <h2 className='text-black text-lg font-bold'>{product.seller}</h2>
+                                                <h2 className='text-black text-xl font-bold'>{product?.name}</h2>
+                                                <h2 className='text-gray-700 text-lg font-bold'>Price: ${product?.price}</h2>
+                                                <h2 className='text-black text-lg font-bold'>{product?.seller}</h2>
                                                 <h2>{product.rating}</h2>
                                             </div>
                                         </div>
@@ -72,10 +83,11 @@ const Products = () => {
                             ))}
                         </div>
 
-                        <div className='order-summary bg-red-300 w-1/4 my-16 rounded-lg h-[200px] p-4'>
+                        <div className='order-summary bg-red-300 w-1/4 my-16 rounded-lg h-[180px] p-4'>
                             <h2 className='text-2xl font-bold'>Order Summary</h2>
                             <p><span className='font-bold'>Total Items:</span> {totalItems}</p>
                             <p><span className='font-bold'>Total Price:</span> ${totalPrice}</p>
+                            <button className='w-full py-3 bg-red-500 text-white rounded-lg font-bold mt-3' onClick={handleClear}>Clear Cart</button>
                         </div>
                     </div>
                 )}
