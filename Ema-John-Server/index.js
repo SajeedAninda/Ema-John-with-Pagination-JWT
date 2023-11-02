@@ -1,5 +1,6 @@
 const express = require('express')
 let cors = require("cors");
+require('dotenv').config()
 const app = express()
 
 app.use(cors());
@@ -27,6 +28,44 @@ async function run() {
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+        // DB COLLECTIONS 
+        const productsCollection = client.db("EmaJohn").collection("productCollection");
+        const cartCollection = client.db("EmaJohn").collection("cartDataCollection");
+
+        // API ENDPOINTS 
+        // GET PRODUCT DATA 
+        app.get('/products', async (req, res) => {
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            const result = await productsCollection.find().skip(page * size).limit(size).toArray();
+            res.send(result);
+        })
+
+        // POST CART DATA 
+        app.post("/cartData", async (req, res) => {
+            const cart = req.body;
+            const result = await cartCollection.insertOne(cart);
+            res.send(result);
+        });
+        // GET ALL CART DATA 
+        app.get("/cartData", async (req, res) => {
+            const result = await cartCollection.find().toArray();
+            res.send(result);
+        });
+        // DELETE ALL CART DATA 
+        app.delete("/cartData", async (req, res) => {
+            const result = await cartCollection.deleteMany({});
+            res.send(result);
+        });
+
+        // GET TOTAL AMOUNT OF PRODUCTS 
+        app.get("/productCount", async (req, res) => {
+            const count = await productsCollection.estimatedDocumentCount();
+            res.send({ count });
+        })
+
+
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
